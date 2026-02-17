@@ -1,7 +1,7 @@
 fn main() {
     // problem_2(4000000);
     //problem_3(600851475143);
-    problem_4(100)
+    problem_4(1000)
 }
 
 fn problem_0(num_odds: u64) {
@@ -76,15 +76,19 @@ fn problem_3(num2check: u64) {
 
 fn problem_4(maxnum: u64) {
     let mut maxpalindrome = String::new();
+    let mut priorpalindrome = 0;
 
-    for i in (1..maxnum).rev() {
-        let currproduct = i * i;
-        let strproduct: String = format!("{:?}", currproduct);
-        let reversed = strproduct.chars().rev().collect::<String>();
-
-        if strproduct == reversed {
-            maxpalindrome = strproduct;
-            break;
+    for i in 1..maxnum {
+        for j in 1..maxnum {
+            let currproduct = i * j;
+            if currproduct > priorpalindrome {
+                let strproduct: String = format!("{:?}", currproduct);
+                let reversed = strproduct.chars().rev().collect::<String>();
+                if strproduct == reversed {
+                    priorpalindrome = currproduct;
+                    maxpalindrome = strproduct;
+                }
+            }
         }
     }
     println!("Largest palindrome that is a square of numbers less than {} is {}", maxnum, maxpalindrome);
