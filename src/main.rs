@@ -5,7 +5,12 @@ fn main() {
     //let _ = problem_5(20);
     //problem_6(100);
     //println!("{}",problem_7(10001));
-    problem_8(13);
+    //println!("{}",problem_8(13));
+    //OVERFLOW
+    //println!("{:?}", problem_9(1000));
+    //ERROR
+    //println!("{}",problem_10(2000000))
+    println!("{}",problem_11())
 }
 
 fn problem_0(num_odds: u64) {
@@ -180,9 +185,9 @@ fn problem_7(n: u64) -> u64 {
 }
 
 fn problem_8(m: usize) -> u64 {
-    assert!(n >= 1);
+    assert!(m >= 1);
     let digits = parse_number_block(include_str!("../data/p8_load.txt"));
-    assert!(digits.len() >= n);
+    assert!(digits.len() >= m);
 
     if m > digits.len() {
         return 0;
@@ -191,7 +196,10 @@ fn problem_8(m: usize) -> u64 {
     let mut max_product = 0;
 
     for i in 0..=(digits.len() - m) {
-        let product: u64 = digits[i..i + m].iter().product();
+        let mut product: u64 = 1;
+        for j in i..i + m {
+            product *= digits[j] as u64;
+        }
         if product > max_product {
             max_product = product;
         }
@@ -204,6 +212,87 @@ fn parse_number_block(s: &str) -> Vec<u32> {
     s.chars().filter_map(|c| c.to_digit(10)).collect()
 }
 
+
+
+fn problem_9(n: u64) -> Result<u64, ()> {
+    for a in 1..(n-1) {
+        for b in (a + 1)..n {
+           let c = n - a - b;
+           if c > b && a * a + b * b == c * c {
+                return Ok(a * b * c);
+            }
+        }
+    }
+
+    Err(())
+}
+
+fn problem_10(n: u64) -> u64 {
+    let mut sum = 0;
+    for i in 2..n {
+        if is_prime(i) {
+            sum += i;
+        }
+    }
+    sum
+}
+
+fn problem_11() -> u64 {
+    let data = include_str!("../data/p11_grid.txt");
+    let mut grid: Vec<Vec<u64>> = Vec::new();
+
+    for line in data.lines() {
+        let row: Vec<u64> = line
+            .split_whitespace()
+            .map(|s| s.parse::<u64>().unwrap())
+            .collect();
+        if !row.is_empty() {
+            grid.push(row);
+        }
+    }
+
+    let rows = grid.len();
+    if rows == 0 {
+        return 0;
+    }
+    let cols = grid[0].len();
+
+    let mut max_product: u64 = 0;
+
+    for r in 0..rows {
+        for c in 0..cols {
+            // horizontal to the right
+            if c + 3 < cols {
+                let mut prod = 1u64;
+                for k in 0..4 { prod *= grid[r][c + k]; }
+                if prod > max_product { max_product = prod; }
+            }
+
+            // vertical down
+            if r + 3 < rows {
+                let mut prod = 1u64;
+                for k in 0..4 { prod *= grid[r + k][c]; }
+                if prod > max_product { max_product = prod; }
+            }
+
+            // diagonal down-right
+            if r + 3 < rows && c + 3 < cols {
+                let mut prod = 1u64;
+                for k in 0..4 { prod *= grid[r + k][c + k]; }
+                if prod > max_product { max_product = prod; }
+            }
+
+            // diagonal down-left
+            if r + 3 < rows && c >= 3 {
+                let mut prod = 1u64;
+                for k in 0..4 { prod *= grid[r + k][c - k]; }
+                if prod > max_product { max_product = prod; }
+            }
+        }
+    }
+
+    max_product
+}
 #[cfg(test)]
 mod tests {
     use super::*;
